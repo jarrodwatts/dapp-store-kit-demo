@@ -1,38 +1,94 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+<p align="center">
+  <img src="./demo.png" height="250px"/>
+</p>
 
-## Getting Started
+<h1 align="center">
+  dApp Store Kit Demo 
+</h1>
 
-First, run the development server:
+<p align="center">
+An example repo showcasing <a href="https://www.dappstorekit.io/">Polygon's dApp Store Kit</a> built with 
+<a href="https://nextjs.org/">Next.js</a>, <a href="https://www.typescriptlang.org/">TypeScript</a>, and <a href="https://tailwindcss.com/">Tailwind CSS</a>.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+<br/>
+
+## Running Locally
+
+1. Clone the repository using `git clone`.
+2. Install dependencies using `npm install`.
+3. Run the development server using `npm run dev`.
+4. Visit `http://localhost:3000` to view the demo.
+
+## How It Works
+
+Below are key code snippets from the demo that show how to use the dApp Store Kit.
+
+### Fetching Featured dApps
+
+On the [homepage](/src//pages/index.tsx), we fetch featured gaming dApps from the registry:
+
+```tsx
+// Base URL for the mainnet API
+const baseURL = "https://api-a.meroku.store";
+
+// Instantiate the dApp Registry API
+const dAppRegistryAPI = new DAppRegistryApi({
+  basePath: baseURL,
+});
+
+// Get the dApps list, and store it in the state
+const dAppsRequest = await dAppRegistryAPI.getDAppV1(
+  1, // page
+  20, // page size
+  undefined, // search term
+  true, // is dapp listed
+  137, // Polygon chain ID
+  undefined, // language
+  undefined, // availableOnPlatform
+  undefined, // matureForAudience
+  undefined, // minAge
+  undefined, // listedOnOrAfter
+  undefined, // listedOnOrBefore
+  undefined, // allowedInCountries
+  undefined, // blockedInCountries
+  [["games"]] // categories
+);
+const dApps = dAppsRequest.data.response;
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Fetching dApp By ID
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+On the [dApp page](/src/pages/dapps/[dappId].tsx), we fetch a dApp by its ID:
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+```tsx
+// useEffect to fetch the dApps and store it in the state
+useEffect(() => {
+  (async () => {
+    if (!dappId) return;
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+    // Base URL for the mainnet API
+    const baseURL = "https://api-a.meroku.store";
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+    // Instantiate the dApp Registry API
+    const dAppRegistryAPI = new DAppRegistryApi({
+      basePath: baseURL,
+    });
 
-## Learn More
+    // Get dApp info by ID
+    const response = await dAppRegistryAPI.apiV1DappSearchDappIdGet(
+      dappId as string
+    );
 
-To learn more about Next.js, take a look at the following resources:
+    // Get the dApp out of the response
+    const result = response?.data?.data?.[0];
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+    // Store the dApp in the state
+    setLoadingDapp(false);
+    setDapp(result);
+  })();
+}, [dappId]);
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Reach Out
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Join the [Polygon Developer Discord](https://discord.gg/0xpolygondevs) for any questions or feedback!
